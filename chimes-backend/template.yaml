@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Chimes Knowledge Companion - Internal FAQ Chatbot Backend
+
+Parameters:
+  KnowledgeBaseId:
+    Type: String
+    Default: DGY6VBFIKO
+    Description: Bedrock Knowledge Base ID
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: nodejs18.x
+    MemorySize: 512
+    Environment:
+      Variables:
+        KNOWLEDGE_BASE_ID: !Ref KnowledgeBaseId
+
+Resources:
+  ChatFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: chimes-chat-function
+      Handler: src/handlers/chat.handler
+      Description: Handles chat requests for Chimes Knowledge Companion
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource:
+                - arn:aws:bedrock:*::foundation-model/anthropic.claude*
+                - arn:aws:bedrock:*::foundation-model/*
+                - !Sub arn:aws:bedrock:*:${AWS::AccountId}:inference-profile/*
+            - Effect: Allow
+              Action:
+                - bedrock:Retrieve
+                - bedrock:RetrieveAndGenerate
+              Resource:
+                - !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:knowledge-base/${KnowledgeBaseId}
+      Events:
+        ChatApi:
+          Type: Api
+          Properties:
+            Path: /chat
+            Method: POST
+            RestApiId: !Ref ChimesApi
+        ChatOptions:
+          Type: Api
+          Properties:
+            Path: /chat
+            Method: OPTIONS
+            RestApiId: !Ref ChimesApi
+
+  ChimesApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: chimes-knowledge-companion-api
+      StageName: Prod
+      Cors:
+        AllowOrigin: "'*'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowMethods: "'POST,OPTIONS'"
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub https://${ChimesApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
+  ChatFunctionArn:
+    Description: Chat Lambda Function ARN
+    Value: !GetAtt ChatFunction.Arn

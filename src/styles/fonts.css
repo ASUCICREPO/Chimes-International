@@ -1,0 +1,18 @@
+/* Open Sans - for headlines and text */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+/* Avenir - for sub-headlines and text */
+/* Note: Avenir is a commercial font. Using system fallback or similar alternative */
+/* If you have Avenir font files, replace these with @font-face declarations */
+
+/* Minion Pro - for additional text */
+/* Note: Minion Pro is a commercial font. Using system fallback or similar alternative */
+/* If you have Minion Pro font files, replace these with @font-face declarations */
+
+:root {
+  /* Font families */
+  --font-headline: 'Open Sans', sans-serif;
+  --font-text: 'Open Sans', sans-serif;
+  --font-subheadline: 'Avenir', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-additional: 'Minion Pro', Georgia, serif;
+}

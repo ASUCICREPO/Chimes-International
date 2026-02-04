@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50">
+  <defs>
+    <linearGradient id="flowerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff7900"/>
+      <stop offset="100%" style="stop-color:#ffb800"/>
+    </linearGradient>
+  </defs>
+  <!-- Flower petals -->
+  <g transform="translate(25, 25)">
+    <ellipse cx="0" cy="-12" rx="5" ry="10" fill="url(#flowerGrad)" transform="rotate(0)"/>
+    <ellipse cx="0" cy="-12" rx="5" ry="10" fill="url(#flowerGrad)" transform="rotate(45)"/>
+    <ellipse cx="0" cy="-12" rx="5" ry="10" fill="url(#flowerGrad)" transform="rotate(90)"/>
+    <ellipse cx="0" cy="-12" rx="5" ry="10" fill="url(#flowerGrad)" transform="rotate(135)"/>
+    <ellipse cx="0" cy="-12" rx="5" ry="10" fill="url(#flowerGrad)" transform="rotate(180)"/>
+    <ellipse cx="0" cy="-12" rx="5" ry="10" fill="url(#flowerGrad)" transform="rotate(225)"/>
+    <ellipse cx="0" cy="-12" rx="5" ry="10" fill="url(#flowerGrad)" transform="rotate(270)"/>
+    <ellipse cx="0" cy="-12" rx="5" ry="10" fill="url(#flowerGrad)" transform="rotate(315)"/>
+    <!-- Center -->
+    <circle cx="0" cy="0" r="6" fill="#ff7900"/>
+  </g>
+  <!-- Chimes text -->
+  <text x="55" y="32" font-family="Arial, sans-serif" font-size="24" font-weight="500" fill="#004165">Chimes</text>
+</svg>
