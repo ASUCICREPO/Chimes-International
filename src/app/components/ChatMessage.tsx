@@ -12,9 +12,10 @@ interface ChatMessageProps {
   content: string;
   citations?: Citation[];
   onRegenerate?: () => void;
+  messageId?: string;
 }
 
-export function ChatMessage({ type, content, citations, onRegenerate }: ChatMessageProps) {
+export function ChatMessage({ type, content, citations, onRegenerate, messageId }: ChatMessageProps) {
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const [showSources, setShowSources] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -23,6 +24,25 @@ export function ChatMessage({ type, content, citations, onRegenerate }: ChatMess
     navigator.clipboard.writeText(content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleFeedback = async (rating: 'up' | 'down') => {
+    const newFeedback = feedback === rating ? null : rating;
+    setFeedback(newFeedback);
+
+    // Send feedback to API (will be implemented when backend is ready)
+    if (newFeedback && messageId) {
+      try {
+        const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || 'https://lo0it0ghy2.execute-api.us-east-1.amazonaws.com/Prod';
+        await fetch(`${apiEndpoint}/feedback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messageId, rating: newFeedback, timestamp: Date.now() })
+        });
+      } catch (error) {
+        console.error('Failed to send feedback:', error);
+      }
+    }
   };
 
   return (
@@ -101,7 +121,7 @@ export function ChatMessage({ type, content, citations, onRegenerate }: ChatMess
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setFeedback(feedback === 'up' ? null : 'up')}
+              onClick={() => handleFeedback('up')}
               className={`p-1.5 rounded-lg transition-colors ${
                 feedback === 'up'
                   ? 'bg-[#ff7900]/15 border border-[#ff7900] text-[#ff7900]'
@@ -114,7 +134,7 @@ export function ChatMessage({ type, content, citations, onRegenerate }: ChatMess
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setFeedback(feedback === 'down' ? null : 'down')}
+              onClick={() => handleFeedback('down')}
               className={`p-1.5 rounded-lg transition-colors ${
                 feedback === 'down'
                   ? 'bg-[#ff7900]/15 border border-[#ff7900] text-[#ff7900]'

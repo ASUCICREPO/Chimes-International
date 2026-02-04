@@ -62,7 +62,7 @@ Employee question: ${message}`;
         type: 'KNOWLEDGE_BASE',
         knowledgeBaseConfiguration: {
           knowledgeBaseId: KNOWLEDGE_BASE_ID,
-          modelArn: `arn:aws:bedrock:${AWS_REGION}::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0`
+          modelArn: `arn:aws:bedrock:${AWS_REGION}::foundation-model/amazon.nova-pro-v1:0`
         }
       }
     });

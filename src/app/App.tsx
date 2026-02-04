@@ -29,6 +29,7 @@ import AdminDashboard from './AdminDashboard';
 const chimesLogo = '/chimes-logo.svg';
 
 interface Message {
+  id?: string;
   type: 'user' | 'assistant';
   content: string;
   citations?: Array<{ text: string; url: string }>;
@@ -178,7 +179,7 @@ function ChatInterface({ language, setLanguage, onNewChat }: ChatInterfaceProps)
     setIsTyping(true);
 
     try {
-      const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || 'https://12g8w9aon6.execute-api.us-east-1.amazonaws.com/Prod';
+      const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || 'https://lo0it0ghy2.execute-api.us-east-1.amazonaws.com/Prod';
 
       const response = await fetch(`${apiEndpoint}/chat`, {
         method: 'POST',
@@ -208,6 +209,7 @@ function ChatInterface({ language, setLanguage, onNewChat }: ChatInterfaceProps)
       })) || [];
 
       const assistantMessage: Message = {
+        id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         type: 'assistant',
         content: data.message,
         citations: citations.length > 0 ? citations : undefined,
@@ -253,7 +255,7 @@ function ChatInterface({ language, setLanguage, onNewChat }: ChatInterfaceProps)
         setIsTyping(true);
 
         try {
-          const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || 'https://12g8w9aon6.execute-api.us-east-1.amazonaws.com/Prod';
+          const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || 'https://lo0it0ghy2.execute-api.us-east-1.amazonaws.com/Prod';
 
           const response = await fetch(`${apiEndpoint}/chat`, {
             method: 'POST',
@@ -387,6 +389,7 @@ function ChatInterface({ language, setLanguage, onNewChat }: ChatInterfaceProps)
                   content={message.content}
                   citations={message.citations}
                   onRegenerate={() => handleRegenerate(index)}
+                  messageId={message.id}
                 />
                 {/* Show follow-up suggestions after assistant messages (but not after typing indicator) */}
                 {message.type === 'assistant' && index === messages.length - 1 && !isTyping && (

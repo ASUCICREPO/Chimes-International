@@ -5,7 +5,7 @@ Description: Chimes Knowledge Companion - Internal FAQ Chatbot Backend
 Parameters:
   KnowledgeBaseId:
     Type: String
-    Default: DGY6VBFIKO
+    Default: LXTPXEJKJ1
     Description: Bedrock Knowledge Base ID
 
 Globals:
@@ -16,6 +16,8 @@ Globals:
     Environment:
       Variables:
         KNOWLEDGE_BASE_ID: !Ref KnowledgeBaseId
+        CONVERSATIONS_TABLE: chimes-conversations
+        FEEDBACK_TABLE: chimes-feedback
 
 Resources:
   ChatFunction:
@@ -39,7 +41,15 @@ Resources:
                 - bedrock:Retrieve
                 - bedrock:RetrieveAndGenerate
               Resource:
-                - !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:knowledge-base/${KnowledgeBaseId}
+                - !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:knowledge-base/LXTPXEJKJ1
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:GetItem
+                - dynamodb:Query
+              Resource:
+                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/chimes-conversations
+                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/chimes-feedback
       Events:
         ChatApi:
           Type: Api
@@ -51,6 +61,33 @@ Resources:
           Type: Api
           Properties:
             Path: /chat
+            Method: OPTIONS
+            RestApiId: !Ref ChimesApi
+
+  FeedbackFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: chimes-feedback-function
+      Handler: src/handlers/feedback.handler
+      Description: Handles feedback submissions
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+              Resource:
+                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/chimes-feedback
+      Events:
+        FeedbackApi:
+          Type: Api
+          Properties:
+            Path: /feedback
+            Method: POST
+            RestApiId: !Ref ChimesApi
+        FeedbackOptions:
+          Type: Api
+          Properties:
+            Path: /feedback
             Method: OPTIONS
             RestApiId: !Ref ChimesApi
 
