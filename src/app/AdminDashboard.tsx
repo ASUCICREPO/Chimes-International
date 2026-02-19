@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Menu, 
   X, 
@@ -16,7 +16,9 @@ import {
   Users,
   MessageCircle,
   ThumbsUp,
-  ThumbsDown
+  ThumbsDown,
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -33,6 +35,24 @@ interface ConversationLog {
   language: 'EN' | 'ES';
 }
 
+interface AnalyticsData {
+  totalConversations: number;
+  positiveFeedback: number;
+  negativeFeedback: number;
+  conversationTrend: Array<{ date: string; conversations: number }>;
+  languageDistribution: Array<{ name: string; value: number }>;
+  topicDistribution: Array<{ name: string; value: number }>;
+  recentConversations: Array<{
+    id: string;
+    date: string;
+    topic: string;
+    language: string;
+    userMessage: string;
+    assistantMessage: string;
+    feedback: string;
+  }>;
+}
+
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -40,45 +60,60 @@ export default function AdminDashboard() {
   const [filterLanguage, setFilterLanguage] = useState<'all' | 'EN' | 'ES'>('all');
   const [filterFeedback, setFilterFeedback] = useState<'all' | 'positive' | 'negative' | 'none'>('all');
 
-  // Mock data
-  const summaryStats = {
-    totalConversations: 1247,
-    topCategories: ['Benefits & PTO', 'IT Help', 'Training'],
-    positiveFeedback: 892,
-    negativeFeedback: 124,
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || 'https://lo0it0ghy2.execute-api.us-east-1.amazonaws.com/Prod';
+      const response = await fetch(`${apiEndpoint}/analytics`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data: AnalyticsData = await response.json();
+      setAnalyticsData(data);
+    } catch (err) {
+      console.error('Failed to fetch analytics:', err);
+      setError('Failed to load dashboard data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const conversationLogs: ConversationLog[] = [
-    { id: '1', date: '2026-01-01 09:23', userRole: 'Employee', topic: 'Benefits & PTO', feedback: 'positive', language: 'EN' },
-    { id: '2', date: '2026-01-01 10:15', userRole: 'Manager', topic: 'IT Help', feedback: 'positive', language: 'EN' },
-    { id: '3', date: '2026-01-01 11:42', userRole: 'Employee', topic: 'Training Requirements', feedback: 'none', language: 'ES' },
-    { id: '4', date: '2026-01-01 13:05', userRole: 'Employee', topic: 'Employee Handbook', feedback: 'negative', language: 'EN' },
-    { id: '5', date: '2026-01-01 14:30', userRole: 'HR Staff', topic: 'Benefits & PTO', feedback: 'positive', language: 'ES' },
-    { id: '6', date: '2026-01-01 15:18', userRole: 'Employee', topic: 'IT Help', feedback: 'positive', language: 'EN' },
-    { id: '7', date: '2026-01-01 16:45', userRole: 'Employee', topic: 'Benefits & PTO', feedback: 'none', language: 'EN' },
-  ];
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
 
-  const conversationTrend = [
-    { date: 'Dec 25', conversations: 145 },
-    { date: 'Dec 26', conversations: 178 },
-    { date: 'Dec 27', conversations: 156 },
-    { date: 'Dec 28', conversations: 189 },
-    { date: 'Dec 29', conversations: 165 },
-    { date: 'Dec 30', conversations: 198 },
-    { date: 'Dec 31', conversations: 216 },
-  ];
+  // Derived values with safe defaults
+  const summaryStats = {
+    totalConversations: analyticsData?.totalConversations ?? 0,
+    positiveFeedback: analyticsData?.positiveFeedback ?? 0,
+    negativeFeedback: analyticsData?.negativeFeedback ?? 0,
+  };
 
-  const topicDistribution = [
-    { name: 'Benefits & PTO', value: 425 },
-    { name: 'IT Help', value: 312 },
-    { name: 'Training', value: 267 },
-    { name: 'Handbook', value: 243 },
-  ];
+  const totalFeedback = summaryStats.positiveFeedback + summaryStats.negativeFeedback;
+  const satisfactionRate = totalFeedback > 0
+    ? ((summaryStats.positiveFeedback / totalFeedback) * 100).toFixed(1)
+    : '0.0';
+  const negativeRate = totalFeedback > 0
+    ? ((summaryStats.negativeFeedback / totalFeedback) * 100).toFixed(1)
+    : '0.0';
 
-  const languageDistribution = [
-    { name: 'English', value: 892 },
-    { name: 'Spanish', value: 355 },
-  ];
+  const conversationTrend = analyticsData?.conversationTrend ?? [];
+  const topicDistribution = analyticsData?.topicDistribution ?? [];
+  const languageDistribution = analyticsData?.languageDistribution ?? [];
+
+  const conversationLogs: ConversationLog[] = (analyticsData?.recentConversations ?? []).map(conv => ({
+    id: conv.id,
+    date: conv.date,
+    userRole: 'Employee',
+    topic: conv.topic,
+    feedback: conv.feedback as 'positive' | 'negative' | 'none',
+    language: conv.language as 'EN' | 'ES',
+  }));
 
   const COLORS = ['#2A6EBB', '#ff7900', '#5A245A', '#A7C1E3'];
 
@@ -205,11 +240,41 @@ export default function AdminDashboard() {
           {/* Dashboard Overview */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
-              <div>
-                <h2 className="text-2xl text-[#004165] mb-1">Dashboard Overview</h2>
-                <p className="text-sm text-[#004165]/70">Monitor key metrics and system performance</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl text-[#004165] mb-1">Dashboard Overview</h2>
+                  <p className="text-sm text-[#004165]/70">Monitor key metrics and system performance</p>
+                </div>
+                <button
+                  onClick={fetchAnalytics}
+                  disabled={loading}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#E3EEF8] text-[#2A6EBB] rounded-lg hover:bg-[#A7C1E3] transition-colors text-sm disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </button>
               </div>
 
+              {loading && (
+                <div className="flex items-center justify-center h-64">
+                  <Loader2 className="w-8 h-8 text-[#2A6EBB] animate-spin" />
+                  <span className="ml-3 text-[#004165]/70">Loading dashboard data...</span>
+                </div>
+              )}
+
+              {error && !loading && (
+                <div className="flex flex-col items-center justify-center h-64">
+                  <p className="text-red-600 mb-4">{error}</p>
+                  <button
+                    onClick={fetchAnalytics}
+                    className="px-4 py-2 bg-[#2A6EBB] text-white rounded-lg hover:bg-[#004165] transition-colors text-sm"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+
+              {!loading && !error && <>
               {/* Summary Cards */}
               <div className="grid grid-cols-4 gap-4">
                 <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
@@ -222,25 +287,17 @@ export default function AdminDashboard() {
                       <MessageCircle className="w-5 h-5 text-[#2A6EBB]" />
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 mt-4 text-xs text-green-600">
-                    <TrendingUp className="w-3 h-3" />
-                    <span>+12% from last week</span>
-                  </div>
                 </div>
 
                 <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-sm text-[#004165]/70 mb-1">Active Users</p>
-                      <p className="text-3xl text-[#004165]">486</p>
+                      <p className="text-sm text-[#004165]/70 mb-1">Total Feedback</p>
+                      <p className="text-3xl text-[#004165]">{totalFeedback}</p>
                     </div>
                     <div className="p-3 bg-[#E3EEF8] rounded-lg">
                       <Users className="w-5 h-5 text-[#2A6EBB]" />
                     </div>
-                  </div>
-                  <div className="flex items-center gap-1 mt-4 text-xs text-green-600">
-                    <TrendingUp className="w-3 h-3" />
-                    <span>+8% from last week</span>
                   </div>
                 </div>
 
@@ -255,7 +312,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 mt-4 text-xs text-[#004165]/70">
-                    <span>87.8% satisfaction rate</span>
+                    <span>{satisfactionRate}% satisfaction rate</span>
                   </div>
                 </div>
 
@@ -270,7 +327,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 mt-4 text-xs text-[#004165]/70">
-                    <span>9.9% of total interactions</span>
+                    <span>{negativeRate}% of total feedback</span>
                   </div>
                 </div>
               </div>
@@ -303,6 +360,7 @@ export default function AdminDashboard() {
                   </ResponsiveContainer>
                 </div>
               </div>
+              </>}
             </div>
           )}
 

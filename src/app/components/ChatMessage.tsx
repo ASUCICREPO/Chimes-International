@@ -1,6 +1,7 @@
 import { ThumbsUp, ThumbsDown, ExternalLink, ChevronDown, ChevronUp, RotateCw, Copy, Bot, User } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
+import Markdown from 'react-markdown';
 
 interface Citation {
   text: string;
@@ -69,7 +70,9 @@ export function ChatMessage({ type, content, citations, onRegenerate, messageId 
               : 'backdrop-blur-sm bg-white/80 text-[#004165] border border-gray-200/50 shadow-sm'
           }`}
         >
-          <p className="leading-relaxed">{content}</p>
+          <div className="leading-relaxed prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-headings:text-[#004165] prose-strong:text-[#004165]">
+            <Markdown>{content}</Markdown>
+          </div>
         </div>
 
         {/* Sources Button - Only for assistant messages with citations */}

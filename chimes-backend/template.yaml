@@ -91,6 +91,65 @@ Resources:
             Method: OPTIONS
             RestApiId: !Ref ChimesApi
 
+  AnalyticsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: chimes-analytics-function
+      Handler: src/handlers/analytics.handler
+      Description: Returns aggregated analytics data for the admin dashboard
+      Timeout: 30
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Scan
+                - dynamodb:Query
+                - dynamodb:GetItem
+              Resource:
+                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/chimes-conversations
+                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/chimes-feedback
+      Events:
+        AnalyticsApi:
+          Type: Api
+          Properties:
+            Path: /analytics
+            Method: GET
+            RestApiId: !Ref ChimesApi
+        AnalyticsOptions:
+          Type: Api
+          Properties:
+            Path: /analytics
+            Method: OPTIONS
+            RestApiId: !Ref ChimesApi
+
+  ConversationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: chimes-conversations-function
+      Handler: src/handlers/conversations.handler
+      Description: Returns recent conversations for chat history sidebar
+      Timeout: 30
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Scan
+              Resource:
+                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/chimes-conversations
+      Events:
+        ConversationsApi:
+          Type: Api
+          Properties:
+            Path: /conversations
+            Method: GET
+            RestApiId: !Ref ChimesApi
+        ConversationsOptions:
+          Type: Api
+          Properties:
+            Path: /conversations
+            Method: OPTIONS
+            RestApiId: !Ref ChimesApi
+
   ChimesApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -99,7 +158,7 @@ Resources:
       Cors:
         AllowOrigin: "'*'"
         AllowHeaders: "'Content-Type,Authorization'"
-        AllowMethods: "'POST,OPTIONS'"
+        AllowMethods: "'GET,POST,OPTIONS'"
 
 Outputs:
   ApiEndpoint:
@@ -108,3 +167,6 @@ Outputs:
   ChatFunctionArn:
     Description: Chat Lambda Function ARN
     Value: !GetAtt ChatFunction.Arn
+  AnalyticsFunctionArn:
+    Description: Analytics Lambda Function ARN
+    Value: !GetAtt AnalyticsFunction.Arn

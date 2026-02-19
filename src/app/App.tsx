@@ -20,6 +20,9 @@ import {
   BookOpen,
   Laptop,
   GraduationCap,
+  History,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import { LoginPage } from './components/LoginPage';
 import { ChatMessage } from './components/ChatMessage';
@@ -37,6 +40,14 @@ interface Message {
 
 type ViewType = 'chat' | 'dashboard';
 
+interface ConversationHistoryItem {
+  conversationId: string;
+  userMessage: string;
+  assistantMessage: string;
+  timestamp: string;
+  language: string;
+}
+
 interface ChatInterfaceProps {
   language: 'en' | 'es';
   setLanguage: (lang: 'en' | 'es') => void;
@@ -48,7 +59,57 @@ function ChatInterface({ language, setLanguage, onNewChat }: ChatInterfaceProps)
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showUploadMenu, setShowUploadMenu] = useState(false);
+  const [showHistory, setShowHistory] = useState(true);
+  const [conversationHistory, setConversationHistory] = useState<ConversationHistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Fetch conversation history
+  const fetchHistory = async () => {
+    setHistoryLoading(true);
+    try {
+      const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || 'https://lo0it0ghy2.execute-api.us-east-1.amazonaws.com/Prod';
+      const response = await fetch(`${apiEndpoint}/conversations`);
+      const data = await response.json();
+      setConversationHistory(data);
+    } catch (error) {
+      console.error('Failed to fetch conversation history:', error);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  // Refresh history after sending a message
+  const refreshHistoryAfterSend = () => {
+    setTimeout(() => fetchHistory(), 1500);
+  };
+
+  const formatRelativeTime = (timestamp: string) => {
+    const now = new Date();
+    const date = new Date(timestamp);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return language === 'es' ? 'Ahora' : 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return language === 'es' ? 'Ayer' : 'Yesterday';
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
+
+  const loadConversation = (conv: ConversationHistoryItem) => {
+    setMessages([
+      { type: 'user', content: conv.userMessage },
+      { type: 'assistant', content: conv.assistantMessage },
+    ]);
+  };
 
   // Translations object
   const translations = {
@@ -216,6 +277,7 @@ function ChatInterface({ language, setLanguage, onNewChat }: ChatInterfaceProps)
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+      refreshHistoryAfterSend();
     } catch (error) {
       console.error('Error calling chat API:', error);
       // Fallback to error message
@@ -337,7 +399,70 @@ function ChatInterface({ language, setLanguage, onNewChat }: ChatInterfaceProps)
   ];
 
   return (
-    <div className="size-full flex flex-col overflow-hidden relative bg-gradient-to-br from-[#FFF9F5] via-[#FFF5ED] to-[#FFEDE0]">
+    <div className="size-full flex overflow-hidden relative bg-gradient-to-br from-[#FFF9F5] via-[#FFF5ED] to-[#FFEDE0]">
+      {/* History Sidebar */}
+      <AnimatePresence>
+        {showHistory && (
+          <motion.div
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 280, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex-shrink-0 h-full border-r border-gray-200/50 bg-white/60 backdrop-blur-sm flex flex-col overflow-hidden"
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200/50">
+              <h3 className="text-sm font-medium text-[#004165]">
+                {language === 'es' ? 'Historial' : 'History'}
+              </h3>
+              <button
+                onClick={() => setShowHistory(false)}
+                className="p-1 rounded-md hover:bg-gray-100 text-gray-500 transition-colors"
+              >
+                <PanelLeftClose className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto py-2">
+              {historyLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-5 h-5 border-2 border-[#2A6EBB] border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : conversationHistory.length === 0 ? (
+                <p className="text-xs text-gray-400 text-center py-8 px-4">
+                  {language === 'es' ? 'Sin conversaciones aún' : 'No conversations yet'}
+                </p>
+              ) : (
+                conversationHistory.map((conv) => (
+                  <button
+                    key={conv.conversationId}
+                    onClick={() => loadConversation(conv)}
+                    className="w-full text-left px-4 py-3 hover:bg-[#E3EEF8]/50 transition-colors border-b border-gray-100 last:border-b-0 group"
+                  >
+                    <p className="text-sm text-[#004165] truncate group-hover:text-[#2A6EBB] transition-colors">
+                      {conv.userMessage}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {formatRelativeTime(conv.timestamp)}
+                    </p>
+                  </button>
+                ))
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Sidebar toggle when hidden */}
+        {!showHistory && (
+          <button
+            onClick={() => setShowHistory(true)}
+            className="absolute left-2 top-2 z-10 p-2 rounded-lg bg-white/80 border border-gray-200/50 hover:bg-white text-gray-500 hover:text-[#2A6EBB] transition-colors shadow-sm"
+          >
+            <PanelLeftOpen className="w-4 h-4" />
+          </button>
+        )}
+
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-8 pb-8 overflow-hidden">
         {/* Title Section - Only show when no messages or just initial message */}
@@ -490,6 +615,8 @@ function ChatInterface({ language, setLanguage, onNewChat }: ChatInterfaceProps)
           </div>
         </div>
       </div>
+      </div>
+      {/* End Main Chat Area */}
     </div>
   );
 }
