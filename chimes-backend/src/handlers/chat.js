@@ -46,27 +46,31 @@ exports.handler = async (event) => {
 Responde completamente en español.
 
 Reglas de formato:
+- NUNCA empieces tu respuesta con "Respuesta:", "Answer:" o cualquier etiqueta. Responde directamente.
+- Para saludos casuales (hola, gracias, etc.), responde de forma cálida y breve, y menciona en qué puedes ayudar.
 - Responde la pregunta directamente en la primera oración. No repitas la pregunta ni uses frases como "¡Qué buena pregunta!"
 - Mantén las respuestas cortas: 3-5 oraciones para preguntas simples. Solo elabora si la pregunta lo requiere.
 - Usa formato markdown: **negrita** para información clave (nombres, fechas, contactos, plazos), viñetas para listas de 3+ elementos
 - Mantén los párrafos a 2-3 oraciones máximo
 - Si hay pasos a seguir, ponlos en una lista numerada clara
-- Termina con UNA línea breve de seguimiento como "¿Necesitas más detalles sobre algún punto?" — no párrafos largos de despedida
+- Solo agrega una pregunta de seguimiento si genuinamente es útil — no la fuerces en cada respuesta
 - Nunca uses lenguaje legal o corporativo innecesario. Escribe como un compañero de trabajo amigable y conocedor.`
       : `You are the Chimes Knowledge Companion, a helpful assistant for Chimes employees.
 
 Formatting rules:
+- NEVER prefix your response with "Answer:", "Response:", or any label. Just reply directly.
+- For casual greetings (hi, hello, thanks), respond warmly and briefly — introduce what you can help with.
 - Answer the question directly in your first sentence. Do NOT repeat the question back or use filler like "Great question!" or "I'm glad you asked."
 - Keep responses short: 3-5 sentences for simple questions. Only elaborate if the question genuinely requires detail.
 - Use markdown formatting: **bold** for key info (names, dates, contacts, deadlines), bullet points for lists of 3+ items
 - Keep paragraphs to 2-3 sentences max
 - If there are action steps, use a clear numbered list
-- End with ONE short follow-up line like "Need more details on any of this?" — not a long closing paragraph
+- Only add a follow-up question if it's genuinely useful — don't force one at the end of every response
 - Never use unnecessary legal or corporate hedging language. Write like a friendly, knowledgeable coworker.`;
 
     const fullPrompt = `${systemPrompt}
 
-Employee question: ${message}`;
+${message}`;
 
     // Use RetrieveAndGenerate - KB handles both retrieval AND response generation
     const command = new RetrieveAndGenerateCommand({
@@ -86,8 +90,10 @@ Employee question: ${message}`;
     const response = await bedrockAgent.send(command);
     console.log('Bedrock response received:', JSON.stringify(response, null, 2));
 
-    // Extract the response text
-    const assistantMessage = response.output?.text || 'I apologize, but I was unable to generate a response.';
+    // Extract the response text, stripping any "Answer:" prefix the model may add
+    const assistantMessage = (response.output?.text || 'I apologize, but I was unable to generate a response.')
+      .replace(/^Answer:\s*/i, '')
+      .replace(/^Response:\s*/i, '');
 
     // Extract citations from the response
     const citations = response.citations?.map((citation, idx) => {
