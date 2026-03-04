@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Shield } from 'lucide-react';
-const chimesLogo = '/chimes-logo.svg';
+const chimesLogo = '/chimes-logo.png';
 
 interface LoginPageProps {
   onLogin: () => void;

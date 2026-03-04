@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-const chimesLogo = '/chimes-logo.svg';
+const chimesLogo = '/chimes-logo.png';
 
 type TabType = 'dashboard' | 'conversations' | 'faqs' | 'analytics' | 'settings';
 

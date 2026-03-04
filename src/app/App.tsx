@@ -29,7 +29,7 @@ import { ChatMessage } from './components/ChatMessage';
 import { TypingIndicator } from './components/TypingIndicator';
 import { LanguageToggle } from './components/LanguageToggle';
 import AdminDashboard from './AdminDashboard';
-const chimesLogo = '/chimes-logo.svg';
+const chimesLogo = '/chimes-logo.png';
 
 interface Message {
   id?: string;
