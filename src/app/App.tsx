@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Send,
@@ -52,9 +52,10 @@ interface ChatInterfaceProps {
   language: 'en' | 'es';
   setLanguage: (lang: 'en' | 'es') => void;
   onNewChat?: () => void;
+  novaModel: string;
 }
 
-function ChatInterface({ language, setLanguage, onNewChat }: ChatInterfaceProps) {
+function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -250,6 +251,7 @@ function ChatInterface({ language, setLanguage, onNewChat }: ChatInterfaceProps)
         body: JSON.stringify({
           message: messageText,
           language: language,
+          model: novaModel,
           conversationHistory: messages.map(m => ({
             role: m.type === 'user' ? 'user' : 'assistant',
             content: m.content
@@ -627,7 +629,19 @@ export default function App() {
   const [language, setLanguage] = useState<'en' | 'es'>('en');
   const [chatKey, setChatKey] = useState(0);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [novaModel, setNovaModel] = useState(() => localStorage.getItem('chimes_nova_model') || 'amazon.nova-pro-v1:0');
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const novaModels = [
+    { id: 'amazon.nova-lite-v1:0', label: 'Lite' },
+    { id: 'amazon.nova-pro-v1:0', label: 'Pro' },
+    { id: 'arn:aws:bedrock:us-east-1:538494148436:inference-profile/us.amazon.nova-premier-v1:0', label: 'Premier' },
+  ];
+
+  const handleModelChange = (modelId: string) => {
+    setNovaModel(modelId);
+    localStorage.setItem('chimes_nova_model', modelId);
+  };
 
   const handleNewChat = () => {
     setChatKey(prev => prev + 1);
@@ -724,6 +738,16 @@ export default function App() {
               >
                 <MessageSquarePlus className="w-5 h-5" />
               </motion.button>
+              <select
+                value={novaModel}
+                onChange={(e) => handleModelChange(e.target.value)}
+                className="text-xs px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-[#004165] cursor-pointer"
+                title="AI Model"
+              >
+                {novaModels.map(m => (
+                  <option key={m.id} value={m.id}>{m.label}</option>
+                ))}
+              </select>
               <LanguageToggle language={language} onChange={setLanguage} />
             </>
           )}
@@ -824,7 +848,7 @@ export default function App() {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         {view === 'chat' ? (
-          <ChatInterface key={chatKey} language={language} setLanguage={setLanguage} onNewChat={handleNewChat} />
+          <ChatInterface key={chatKey} language={language} setLanguage={setLanguage} onNewChat={handleNewChat} novaModel={novaModel} />
         ) : (
           <AdminDashboard />
         )}

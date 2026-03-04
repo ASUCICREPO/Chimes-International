@@ -29,6 +29,8 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body || '{}');
     language = body.language || 'en';
     const { message } = body;
+    const requestedModel = body.model || 'amazon.nova-pro-v1:0';
+    const modelArn = requestedModel.startsWith('arn:') ? requestedModel : `arn:aws:bedrock:${AWS_REGION}::foundation-model/${requestedModel}`;
 
     if (!message) {
       return {
@@ -75,7 +77,7 @@ Employee question: ${message}`;
         type: 'KNOWLEDGE_BASE',
         knowledgeBaseConfiguration: {
           knowledgeBaseId: KNOWLEDGE_BASE_ID,
-          modelArn: `arn:aws:bedrock:${AWS_REGION}::foundation-model/amazon.nova-pro-v1:0`
+          modelArn: modelArn
         }
       }
     });
