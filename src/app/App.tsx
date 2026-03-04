@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Send,
@@ -63,7 +63,8 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
   const [showHistory, setShowHistory] = useState(true);
   const [conversationHistory, setConversationHistory] = useState<ConversationHistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
-  const [usedSuggestions, setUsedSuggestions] = useState<Set<string>>(new Set());
+  const [activeSuggestions, setActiveSuggestions] = useState<string[]>([]);
+  const usedSuggestionsRef = useRef<Set<string>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch conversation history
@@ -213,13 +214,11 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
     ],
   };
 
-  const activeSuggestions = useMemo(() => {
-    const pool = followUpSuggestions[language].filter(s => !usedSuggestions.has(s));
-    const source = pool.length >= 3 ? pool : followUpSuggestions[language];
-    const shuffled = [...source].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 3);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [language, messages.length]);
+  const pickSuggestions = (lang: 'en' | 'es') => {
+    const pool = followUpSuggestions[lang].filter(s => !usedSuggestionsRef.current.has(s));
+    const source = pool.length >= 3 ? pool : followUpSuggestions[lang];
+    return [...source].sort(() => Math.random() - 0.5).slice(0, 3);
+  };
 
   const promptIcons = [Heart, BookOpen, Laptop, GraduationCap];
 
@@ -288,6 +287,7 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+      setActiveSuggestions(pickSuggestions(language));
       refreshHistoryAfterSend();
     } catch (error) {
       console.error('Error calling chat API:', error);
@@ -305,7 +305,7 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
   };
 
   const handleSuggestedPrompt = (prompt: string) => {
-    setUsedSuggestions(prev => new Set([...prev, prompt]));
+    usedSuggestionsRef.current.add(prompt);
     handleSendMessage(prompt);
   };
 
@@ -313,7 +313,8 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
     setMessages([]);
     setInputText('');
     setIsTyping(false);
-    setUsedSuggestions(new Set());
+    usedSuggestionsRef.current = new Set();
+    setActiveSuggestions([]);
     if (onNewChat) {
       onNewChat();
     }
