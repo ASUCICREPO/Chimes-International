@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Send,
@@ -63,6 +63,7 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
   const [showHistory, setShowHistory] = useState(true);
   const [conversationHistory, setConversationHistory] = useState<ConversationHistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [usedSuggestions, setUsedSuggestions] = useState<Set<string>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch conversation history
@@ -212,6 +213,14 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
     ],
   };
 
+  const activeSuggestions = useMemo(() => {
+    const pool = followUpSuggestions[language].filter(s => !usedSuggestions.has(s));
+    const source = pool.length >= 3 ? pool : followUpSuggestions[language];
+    const shuffled = [...source].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 3);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language, messages.length]);
+
   const promptIcons = [Heart, BookOpen, Laptop, GraduationCap];
 
   // Set initial welcome message when language changes
@@ -296,6 +305,7 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
   };
 
   const handleSuggestedPrompt = (prompt: string) => {
+    setUsedSuggestions(prev => new Set([...prev, prompt]));
     handleSendMessage(prompt);
   };
 
@@ -303,6 +313,7 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
     setMessages([]);
     setInputText('');
     setIsTyping(false);
+    setUsedSuggestions(new Set());
     if (onNewChat) {
       onNewChat();
     }
@@ -521,7 +532,7 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
                 {/* Show follow-up suggestions after assistant messages (but not after typing indicator) */}
                 {message.type === 'assistant' && index === messages.length - 1 && !isTyping && (
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {followUpSuggestions[language].slice(0, 3).map((suggestion, idx) => (
+                    {activeSuggestions.map((suggestion, idx) => (
                       <motion.button
                         key={idx}
                         whileHover={{ scale: 1.02 }}
