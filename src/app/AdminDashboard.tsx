@@ -53,12 +53,26 @@ interface AnalyticsData {
   }>;
 }
 
+const NOVA_MODELS = [
+  { id: 'amazon.nova-lite-v1:0', label: 'Nova Lite', description: 'Fastest, most cost-effective' },
+  { id: 'amazon.nova-pro-v1:0', label: 'Nova Pro', description: 'Balanced performance (default)' },
+  { id: 'arn:aws:bedrock:us-east-1:538494148436:inference-profile/us.amazon.nova-premier-v1:0', label: 'Nova Premier', description: 'Most capable, highest cost' },
+];
+
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterLanguage, setFilterLanguage] = useState<'all' | 'EN' | 'ES'>('all');
   const [filterFeedback, setFilterFeedback] = useState<'all' | 'positive' | 'negative' | 'none'>('all');
+  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem('chimes_nova_model') || 'amazon.nova-pro-v1:0');
+  const [modelSaved, setModelSaved] = useState(false);
+
+  const handleSaveModel = () => {
+    localStorage.setItem('chimes_nova_model', selectedModel);
+    setModelSaved(true);
+    setTimeout(() => setModelSaved(false), 2000);
+  };
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
