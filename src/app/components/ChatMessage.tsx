@@ -34,7 +34,11 @@ export function ChatMessage({ type, content, citations, onRegenerate, messageId 
     // Send feedback to API (will be implemented when backend is ready)
     if (newFeedback && messageId) {
       try {
-        const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || 'https://12g8w9aon6.execute-api.us-east-1.amazonaws.com/Prod';
+        const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+        if (!apiEndpoint) {
+          console.warn('VITE_API_ENDPOINT is not configured');
+          return;
+        }
         await fetch(`${apiEndpoint}/feedback`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -71,7 +71,12 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
   const fetchHistory = async () => {
     setHistoryLoading(true);
     try {
-      const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || 'https://lo0it0ghy2.execute-api.us-east-1.amazonaws.com/Prod';
+      const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+      if (!apiEndpoint) {
+        console.warn('VITE_API_ENDPOINT is not configured');
+        setHistoryLoading(false);
+        return;
+      }
       const response = await fetch(`${apiEndpoint}/conversations`);
       const data = await response.json();
       setConversationHistory(data);
@@ -249,7 +254,10 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
     setIsTyping(true);
 
     try {
-      const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || 'https://lo0it0ghy2.execute-api.us-east-1.amazonaws.com/Prod';
+      const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+      if (!apiEndpoint) {
+        throw new Error('VITE_API_ENDPOINT is not configured');
+      }
 
       const response = await fetch(`${apiEndpoint}/chat`, {
         method: 'POST',
@@ -331,7 +339,10 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
         setIsTyping(true);
 
         try {
-          const apiEndpoint = import.meta.env.VITE_API_ENDPOINT || 'https://lo0it0ghy2.execute-api.us-east-1.amazonaws.com/Prod';
+          const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
+          if (!apiEndpoint) {
+            throw new Error('VITE_API_ENDPOINT is not configured');
+          }
 
           const response = await fetch(`${apiEndpoint}/chat`, {
             method: 'POST',
