@@ -15,9 +15,11 @@ backend/.aws-sam/
 .env.local
 .env.*.local
 
-# IDE
+# IDE & AI Tools
 .vscode/
 .idea/
+.claude/
+.amazonq/
 *.swp
 *.swo
 *~
@@ -39,3 +41,5 @@ coverage/
 # Misc
 *.tsbuildinfo
 .cache/
+eval/
+logo-resized.png
