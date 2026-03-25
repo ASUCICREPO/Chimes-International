@@ -12,6 +12,18 @@ An AI-powered internal knowledge assistant for **Chimes International** employee
 
 ---
 
+## Project Structure
+
+```
+Chimes International/
+├── frontend/          # React + Vite frontend application
+├── backend/           # AWS Lambda backend (SAM template)
+├── README.md          # This file
+└── SECURITY_NOTES.md  # Security documentation
+```
+
+---
+
 ## Architecture
 
 ```

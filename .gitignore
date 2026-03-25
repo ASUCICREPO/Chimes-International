@@ -1,10 +1,13 @@
 # Dependencies
 node_modules/
-chimes-backend/node_modules/
+frontend/node_modules/
+backend/node_modules/
 
 # Build outputs
 dist/
 build/
+frontend/dist/
+backend/.aws-sam/
 .aws-sam/
 
 # Environment variables
