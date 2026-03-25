@@ -1,0 +1,95 @@
+version: 0.2
+
+# AWS CodeBuild buildspec for Chimes International
+# This builds and deploys both frontend and backend
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo "Installing AWS SAM CLI..."
+      - pip3 install aws-sam-cli
+      - echo "Verifying installations..."
+      - node --version
+      - npm --version
+      - sam --version
+      - aws --version
+
+  pre_build:
+    commands:
+      - echo "Pre-build phase started on `date`"
+      - echo "Configuring AWS region..."
+      - export AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
+      - echo "Getting AWS account identity..."
+      - aws sts get-caller-identity
+
+  build:
+    commands:
+      - echo "Build phase started on `date`"
+
+      # Build Backend
+      - echo "Building backend..."
+      - cd backend
+      - npm install
+      - sam build
+      - echo "Deploying backend..."
+      - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+
+      # Get API endpoint from CloudFormation
+      - export API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name ${STACK_NAME:-chimes-backend} --query 'Stacks[0].Outputs[?OutputKey==`ApiEndpoint`].OutputValue' --output text)
+      - echo "Backend API Endpoint - $API_ENDPOINT"
+      - cd ..
+
+      # Build Frontend
+      - echo "Building frontend..."
+      - cd frontend
+      - npm install
+
+      # Create .env.local with API endpoint
+      - echo "VITE_API_ENDPOINT=$API_ENDPOINT" > .env.local
+      - echo "VITE_AWS_REGION=$AWS_DEFAULT_REGION" >> .env.local
+
+      - npm run build
+      - echo "Frontend build complete"
+      - cd ..
+
+  post_build:
+    commands:
+      - echo "Post-build phase started on `date`"
+
+      # Deploy frontend to S3 if FRONTEND_BUCKET is set
+      - |
+        if [ -n "$FRONTEND_BUCKET" ]; then
+          echo "Deploying frontend to S3 bucket: $FRONTEND_BUCKET"
+          aws s3 sync frontend/dist/ s3://$FRONTEND_BUCKET --delete
+
+          # Invalidate CloudFront cache if distribution ID is set
+          if [ -n "$CLOUDFRONT_DISTRIBUTION_ID" ]; then
+            echo "Invalidating CloudFront cache..."
+            aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
+          fi
+        else
+          echo "FRONTEND_BUCKET not set. Frontend built but not deployed to S3."
+          echo "Built files are available in frontend/dist/"
+        fi
+
+      - echo "Build completed successfully on `date`"
+
+artifacts:
+  files:
+    - frontend/dist/**/*
+    - backend/.aws-sam/**/*
+  name: chimes-build-$(date +%Y%m%d-%H%M%S)
+
+cache:
+  paths:
+    - 'frontend/node_modules/**/*'
+    - 'backend/node_modules/**/*'
+    - '/root/.npm/**/*'
+
+# Environment variables required:
+# - AWS_REGION (optional, default: us-east-1)
+# - STACK_NAME (optional, default: chimes-backend)
+# - FRONTEND_BUCKET (optional, S3 bucket for frontend)
+# - CLOUDFRONT_DISTRIBUTION_ID (optional, for cache invalidation)

@@ -1,0 +1,26 @@
+version: 1
+
+# AWS Amplify buildspec for Chimes International Frontend
+# This file is used when deploying only the frontend to AWS Amplify
+
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "Installing dependencies..."
+        - npm install
+    build:
+      commands:
+        - echo "Building React application..."
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+
+# Environment variables needed (set in Amplify Console):
+# - VITE_API_ENDPOINT: Your API Gateway endpoint
+# - VITE_AWS_REGION: AWS region (e.g., us-east-1)
