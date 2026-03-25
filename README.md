@@ -18,9 +18,24 @@ An AI-powered internal knowledge assistant for **Chimes International** employee
 Chimes International/
 ├── frontend/          # React + Vite frontend application
 ├── backend/           # AWS Lambda backend (SAM template)
-├── README.md          # This file
-└── SECURITY_NOTES.md  # Security documentation
+├── docs/              # Comprehensive documentation
+├── deploy.sh          # Automated deployment script
+├── buildspec.yml      # AWS CodeBuild CI/CD configuration
+├── LICENSE            # MIT License
+└── README.md          # This file
 ```
+
+---
+
+## 📚 Documentation
+
+Comprehensive documentation is available in the [`docs/`](./docs/) folder:
+
+- **[User Guide](./docs/USER_GUIDE.md)** - How to use the application
+- **[API Documentation](./docs/API_DOCUMENTATION.md)** - REST API reference
+- **[Architecture](./docs/ARCHITECTURE.md)** - System design and patterns
+- **[Infrastructure](./docs/INFRASTRUCTURE.md)** - AWS services and deployment
+- **[Deployment Guide](./DEPLOYMENT.md)** - How to deploy the application
 
 ---
 
