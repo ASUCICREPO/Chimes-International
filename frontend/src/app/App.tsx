@@ -29,7 +29,7 @@ import { ChatMessage } from './components/ChatMessage';
 import { TypingIndicator } from './components/TypingIndicator';
 import { LanguageToggle } from './components/LanguageToggle';
 import AdminDashboard from './AdminDashboard';
-const chimesLogo = '/chimes-logo.png';
+import { branding, getLocalStorageKey } from './branding';
 
 interface Message {
   id?: string;
@@ -122,8 +122,8 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
   // Translations object
   const translations = {
     en: {
-      title: 'Chimes Knowledge Companion',
-      welcome: 'Hello! I\'m the Chimes Knowledge Companion. I\'m here to help you with questions about HR policies, IT support, benefits, training, and more. How can I assist you today?',
+      title: branding.translations.en.title,
+      welcome: branding.translations.en.welcome,
       prompts: ['Benefits & PTO', 'Employee Handbook', 'IT Help', 'Training Requirements'],
       promptDescriptions: [
         'Learn about your benefits and time off',
@@ -131,36 +131,13 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
         'Get technical support and help',
         'View required training modules'
       ],
-      placeholder: 'Ask your own question about Chimes policies, programs, or resources...',
-      responses: {
-        'Benefits & PTO': {
-          content: 'Chimes offers comprehensive benefits including medical, dental, and vision coverage. Full-time employees receive 15 days of PTO annually, increasing with tenure. You also have access to 401(k) matching and wellness programs.',
-          citations: [
-            { text: 'Benefits Guide 2025', url: 'https://chimes.org/benefits' },
-            { text: 'PTO Policy', url: 'https://chimes.org/pto' },
-          ],
-        },
-        'Employee Handbook': {
-          content: 'The Employee Handbook covers our policies, procedures, code of conduct, and organizational values. You can find information on workplace expectations, safety protocols, and employee resources.',
-          citations: [{ text: 'Employee Handbook', url: 'https://chimes.org/handbook' }],
-        },
-        'IT Help': {
-          content: 'For IT support, you can submit a ticket through our internal portal or contact the IT helpdesk at ext. 5555. Common issues like password resets, software installations, and access requests are usually resolved within 24 hours.',
-          citations: [{ text: 'IT Support Portal', url: 'https://chimes.org/it-support' }],
-        },
-        'Training Requirements': {
-          content: 'All employees must complete annual training modules including: HIPAA compliance, workplace safety, diversity & inclusion, and cybersecurity awareness. New employees have additional onboarding requirements specific to their role.',
-          citations: [
-            { text: 'Training Portal', url: 'https://chimes.org/training' },
-            { text: 'Compliance Requirements', url: 'https://chimes.org/compliance' },
-          ],
-        },
-      },
+      placeholder: branding.translations.en.placeholder,
+      responses: branding.responses.en,
       defaultResponse: (query: string) => `Thank you for your question about "${query}". I'm here to help! Based on our knowledge base, I can provide you with relevant information. Would you like me to look up specific policies or resources related to your inquiry?`,
     },
     es: {
-      title: 'Compañero de Conocimiento Chimes',
-      welcome: '¡Hola! Soy el Compañero de Conocimiento Chimes. Estoy aquí para ayudarte con preguntas sobre políticas de recursos humanos, soporte de TI, beneficios, capacitación y más. ¿Cómo puedo asistirte hoy?',
+      title: branding.translations.es.title,
+      welcome: branding.translations.es.welcome,
       prompts: ['Beneficios y PTO', 'Manual del Empleado', 'Ayuda de TI', 'Requisitos de Capacitación'],
       promptDescriptions: [
         'Aprende sobre tus beneficios y tiempo libre',
@@ -168,31 +145,8 @@ function ChatInterface({ language, setLanguage, onNewChat, novaModel }: ChatInte
         'Obtén soporte técnico y ayuda',
         'Ver módulos de capacitación requeridos'
       ],
-      placeholder: 'Haz tu propia pregunta sobre políticas, programas o recursos de Chimes...',
-      responses: {
-        'Beneficios y PTO': {
-          content: 'Chimes ofrece beneficios integrales que incluyen cobertura médica, dental y de visión. Los empleados de tiempo completo reciben 15 días de PTO anualmente, que aumentan con la antigüedad. También tienes acceso a igualación 401(k) y programas de bienestar.',
-          citations: [
-            { text: 'Guía de Beneficios 2025', url: 'https://chimes.org/benefits' },
-            { text: 'Política de PTO', url: 'https://chimes.org/pto' },
-          ],
-        },
-        'Manual del Empleado': {
-          content: 'El Manual del Empleado cubre nuestras políticas, procedimientos, código de conducta y valores organizacionales. Puedes encontrar información sobre expectativas laborales, protocolos de seguridad y recursos para empleados.',
-          citations: [{ text: 'Manual del Empleado', url: 'https://chimes.org/handbook' }],
-        },
-        'Ayuda de TI': {
-          content: 'Para soporte de TI, puedes enviar un ticket a través de nuestro portal interno o contactar al servicio de ayuda de TI en la ext. 5555. Los problemas comunes como restablecimiento de contraseñas, instalaciones de software y solicitudes de acceso generalmente se resuelven en 24 horas.',
-          citations: [{ text: 'Portal de Soporte de TI', url: 'https://chimes.org/it-support' }],
-        },
-        'Requisitos de Capacitación': {
-          content: 'Todos los empleados deben completar módulos de capacitación anual que incluyen: cumplimiento de HIPAA, seguridad en el lugar de trabajo, diversidad e inclusión, y conciencia de ciberseguridad. Los nuevos empleados tienen requisitos de incorporación adicionales específicos para su función.',
-          citations: [
-            { text: 'Portal de Capacitación', url: 'https://chimes.org/training' },
-            { text: 'Requisitos de Cumplimiento', url: 'https://chimes.org/compliance' },
-          ],
-        },
-      },
+      placeholder: branding.translations.es.placeholder,
+      responses: branding.responses.es,
       defaultResponse: (query: string) => `Gracias por tu pregunta sobre "${query}". ¡Estoy aquí para ayudar! Basándome en nuestra base de conocimientos, puedo proporcionarte información relevante. ¿Te gustaría que busque políticas o recursos específicos relacionados con tu consulta?`,
     },
   };
@@ -652,7 +606,7 @@ export default function App() {
   const [language, setLanguage] = useState<'en' | 'es'>('en');
   const [chatKey, setChatKey] = useState(0);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [novaModel, setNovaModel] = useState(() => localStorage.getItem('chimes_nova_model') || 'amazon.nova-pro-v1:0');
+  const [novaModel, setNovaModel] = useState(() => localStorage.getItem(getLocalStorageKey('nova_model')) || 'amazon.nova-pro-v1:0');
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   const novaModels = [
@@ -663,7 +617,7 @@ export default function App() {
 
   const handleModelChange = (modelId: string) => {
     setNovaModel(modelId);
-    localStorage.setItem('chimes_nova_model', modelId);
+    localStorage.setItem(getLocalStorageKey('nova_model'), modelId);
   };
 
   const handleNewChat = () => {
@@ -715,7 +669,7 @@ export default function App() {
       {/* Unified Header */}
       <div className="flex items-center justify-between px-8 py-4 bg-white border-b border-gray-200">
         <div className="flex items-center gap-2">
-          <img src={chimesLogo} alt="Chimes" className="h-14" />
+          <img src={branding.logoPath} alt={branding.logoAlt} className="h-14" />
         </div>
         
         {/* Center Toggle */}
@@ -807,7 +761,7 @@ export default function App() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-[#004165] truncate">Admin User</p>
-                        <p className="text-xs text-[#004165]/60 truncate">admin@chimes.org</p>
+                        <p className="text-xs text-[#004165]/60 truncate">{branding.adminEmail}</p>
                       </div>
                     </div>
                   </div>

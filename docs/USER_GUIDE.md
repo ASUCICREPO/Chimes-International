@@ -1,6 +1,6 @@
-# Chimes Knowledge Companion - User Guide
+# Knowledge Companion - User Guide
 
-Welcome to the Chimes Knowledge Companion! This guide will help you get the most out of your AI-powered knowledge assistant.
+Welcome to the Knowledge Companion! This guide will help you get the most out of your AI-powered knowledge assistant.
 
 ## Table of Contents
 
@@ -33,7 +33,7 @@ Welcome to the Chimes Knowledge Companion! This guide will help you get the most
 
 ### 1. Asking Questions
 
-The Chimes Knowledge Companion can answer questions about:
+The Knowledge Companion can answer questions about:
 - **HR Policies**: Vacation time, benefits, payroll, time off
 - **IT Support**: Software access, technical issues, equipment requests
 - **Company Policies**: Code of conduct, remote work, dress code
@@ -215,7 +215,7 @@ A: Conversations are stored for analytics but are not linked to your personal id
 A: Yes! The interface is fully responsive and works on all devices (desktop, tablet, mobile).
 
 **Q: How accurate is the AI?**
-A: The AI is trained on official Chimes company documents and provides accurate information with source citations. However, always verify critical information with HR or your manager.
+A: The AI is trained on official company documents and provides accurate information with source citations. However, always verify critical information with HR or your manager.
 
 **Q: What if the AI doesn't know the answer?**
 A: The AI will tell you if it doesn't have enough information. In that case, contact HR directly or submit a help desk ticket.
@@ -326,7 +326,7 @@ A: Not currently, but this feature may be added in the future.
    - Clear cache
    - Try a different browser
 3. **Contact IT Support**:
-   - Email: itsupport@chimes.org
+   - Email: support@yourorganization.com
    - Phone: ext. 1234
    - Include:
      - What you were trying to do
@@ -336,7 +336,7 @@ A: Not currently, but this feature may be added in the future.
 
 ---
 
-## Best Practices for Chimes Employees
+## Best Practices for Employees
 
 ### When to Use the Knowledge Companion
 
@@ -423,7 +423,7 @@ A: Not currently, but this feature may be added in the future.
 
 **We Want to Hear From You!**
 
-Help us improve the Chimes Knowledge Companion:
+Help us improve the Knowledge Companion:
 - Use the thumbs up/down buttons after each response
 - Contact IT with feature requests
 - Report outdated or incorrect information
@@ -457,4 +457,4 @@ Help us improve the Chimes Knowledge Companion:
 
 **Version**: 1.0
 **Last Updated**: March 2025
-**For Technical Support**: Contact IT Support at itsupport@chimes.org
+**For Technical Support**: Contact IT Support at support@yourorganization.com

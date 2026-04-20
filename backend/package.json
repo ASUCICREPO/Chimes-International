@@ -1,7 +1,7 @@
 {
-  "name": "chimes-backend",
+  "name": "kb-companion-backend",
   "version": "1.0.0",
-  "description": "Chimes Knowledge Companion - Lambda Backend",
+  "description": "Knowledge Companion - Lambda Backend",
   "main": "src/handlers/chat.js",
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.700.0",

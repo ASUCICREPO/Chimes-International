@@ -1,6 +1,6 @@
 version: 0.2
 
-# AWS CodeBuild buildspec for Chimes International
+# AWS CodeBuild buildspec for Knowledge Companion
 # This builds and deploys both frontend and backend
 
 phases:
@@ -37,7 +37,7 @@ phases:
       - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
 
       # Get API endpoint from CloudFormation
-      - export API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name ${STACK_NAME:-chimes-backend} --query 'Stacks[0].Outputs[?OutputKey==`ApiEndpoint`].OutputValue' --output text)
+      - export API_ENDPOINT=$(aws cloudformation describe-stacks --stack-name ${STACK_NAME:-kb-companion-backend} --query 'Stacks[0].Outputs[?OutputKey==`ApiEndpoint`].OutputValue' --output text)
       - echo "Backend API Endpoint - $API_ENDPOINT"
       - cd ..
 
@@ -80,7 +80,7 @@ artifacts:
   files:
     - frontend/dist/**/*
     - backend/.aws-sam/**/*
-  name: chimes-build-$(date +%Y%m%d-%H%M%S)
+  name: kb-companion-build-$(date +%Y%m%d-%H%M%S)
 
 cache:
   paths:
@@ -90,6 +90,6 @@ cache:
 
 # Environment variables required:
 # - AWS_REGION (optional, default: us-east-1)
-# - STACK_NAME (optional, default: chimes-backend)
+# - STACK_NAME (optional, default: kb-companion-backend)
 # - FRONTEND_BUCKET (optional, S3 bucket for frontend)
 # - CLOUDFRONT_DISTRIBUTION_ID (optional, for cache invalidation)

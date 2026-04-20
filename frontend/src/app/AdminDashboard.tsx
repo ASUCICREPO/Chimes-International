@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-const chimesLogo = '/chimes-logo.png';
+import { getLocalStorageKey } from './branding';
 
 type TabType = 'dashboard' | 'conversations' | 'faqs' | 'analytics' | 'settings';
 
@@ -65,11 +65,11 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterLanguage, setFilterLanguage] = useState<'all' | 'EN' | 'ES'>('all');
   const [filterFeedback, setFilterFeedback] = useState<'all' | 'positive' | 'negative' | 'none'>('all');
-  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem('chimes_nova_model') || 'amazon.nova-pro-v1:0');
+  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem(getLocalStorageKey('nova_model')) || 'amazon.nova-pro-v1:0');
   const [modelSaved, setModelSaved] = useState(false);
 
   const handleSaveModel = () => {
-    localStorage.setItem('chimes_nova_model', selectedModel);
+    localStorage.setItem(getLocalStorageKey('nova_model'), selectedModel);
     setModelSaved(true);
     setTimeout(() => setModelSaved(false), 2000);
   };

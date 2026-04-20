@@ -1,6 +1,6 @@
-# Chimes Knowledge Companion - System Architecture
+# Knowledge Companion - System Architecture
 
-This document provides a comprehensive overview of the Chimes Knowledge Companion's system architecture, design patterns, and technical implementation details.
+This document provides a comprehensive overview of the Knowledge Companion's system architecture, design patterns, and technical implementation details.
 
 ## Table of Contents
 
@@ -106,7 +106,7 @@ frontend/
 │   └── styles/
 │       └── index.css                  # Global styles (Tailwind)
 ├── public/
-│   └── chimes-logo.svg               # Company branding
+│   └── logo.png                       # Company branding
 └── package.json                       # Dependencies
 ```
 
@@ -265,7 +265,7 @@ exports.handler = async (event) => {
    └─> Stores in DynamoDB
 
 4. DynamoDB Write
-   └─> Table: chimes-feedback
+   └─> Table: kb-feedback
    └─> Item: {
          feedbackId: "fb-xyz",
          messageId: "msg-1234567890",
@@ -508,10 +508,10 @@ Application Logs
 CloudWatch Logs
       ↓
 Log Groups:
-  - /aws/lambda/chimes-chat
-  - /aws/lambda/chimes-feedback
-  - /aws/lambda/chimes-analytics
-  - /aws/api-gateway/chimes-api
+  - /aws/lambda/kb-chat
+  - /aws/lambda/kb-feedback
+  - /aws/lambda/kb-analytics
+  - /aws/api-gateway/kb-api
 ```
 
 ### Metrics
@@ -547,7 +547,7 @@ Log Groups:
 ### Phase 3: Advanced AI
 - Multi-modal support (images, charts)
 - Proactive suggestions based on user patterns
-- Integration with Chimes HR systems
+- Integration with HR systems
 - Voice interface with Amazon Transcribe/Polly
 
 ### Phase 4: Platform Expansion

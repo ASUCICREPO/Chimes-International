@@ -1,6 +1,6 @@
-# Chimes Backend
+# Backend
 
-AWS Lambda backend for the Chimes Knowledge Companion, built with AWS SAM.
+AWS Lambda backend for the Knowledge Companion, built with AWS SAM.
 
 ## Tech Stack
 
@@ -68,7 +68,7 @@ sam deploy --guided
 ```
 
 Follow the prompts to configure:
-- Stack name (e.g., `chimes-backend`)
+- Stack name (e.g., `kb-companion-backend`)
 - AWS Region
 - Confirm changes before deploy
 - Allow SAM CLI IAM role creation

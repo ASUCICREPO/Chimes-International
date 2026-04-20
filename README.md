@@ -1,10 +1,10 @@
 <div align="center">
 
-# 🔔 Chimes Knowledge Companion
+# 🔔 Knowledge Companion
 
 ### AI-Powered Internal Knowledge Assistant
 
-An intelligent, bilingual assistant for Chimes International employees, providing instant answers to HR, IT, benefits, and policy questions with source citations from official company documents.
+An intelligent, bilingual assistant for your organization's employees, providing instant answers to HR, IT, benefits, and policy questions with source citations from official company documents.
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://main.d1an0vqq41s0dw.amplifyapp.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -70,8 +70,8 @@ An intelligent, bilingual assistant for Chimes International employees, providin
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/ASUCICREPO/Chimes-International.git
-cd "Chimes International"
+git clone [your-repo-url]
+cd "[project-directory]"
 
 # 2. Deploy backend
 cd backend
@@ -95,7 +95,7 @@ Visit `http://localhost:5173` to see the app running locally.
 ## 📁 Project Structure
 
 ```
-Chimes-International/
+[project-directory]/
 ├── frontend/                    # React + TypeScript + Vite
 │   ├── src/
 │   │   ├── app/
@@ -194,7 +194,7 @@ sam deploy --guided
 ```
 
 Configuration prompts:
-- Stack name: `chimes-knowledge-companion`
+- Stack name: `knowledge-companion`
 - Region: `us-east-1`
 - KnowledgeBaseId: `<your-bedrock-kb-id>`
 
@@ -215,7 +215,7 @@ For detailed instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ## 🤝 Contributing
 
-This project was built for the Chimes International CIC Innovation Challenge. Contributions are welcome!
+Contributions are welcome!
 
 ---
 
@@ -239,6 +239,6 @@ Built with:
 
 <div align="center">
 
-**Made for Chimes International**
+**Made for your organization**
 
 </div>

@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This guide covers various deployment methods for the Chimes International application.
+This guide covers various deployment methods for the Knowledge Companion application.
 
 ## Table of Contents
 
@@ -67,7 +67,7 @@ chmod +x deploy.sh
 
 ```bash
 # Optional environment variables
-export STACK_NAME="chimes-backend"           # Backend stack name
+export STACK_NAME="kb-companion-backend"           # Backend stack name
 export AWS_REGION="us-east-1"                # AWS region
 export FRONTEND_BUCKET="my-frontend-bucket"  # S3 bucket for frontend
 export CLOUDFRONT_DISTRIBUTION_ID="E1234"    # CloudFront distribution
@@ -108,7 +108,7 @@ export CLOUDFRONT_DISTRIBUTION_ID="E1234"    # CloudFront distribution
 5. **Get the API endpoint:**
    ```bash
    aws cloudformation describe-stacks \
-     --stack-name chimes-backend \
+     --stack-name kb-companion-backend \
      --query 'Stacks[0].Outputs[?OutputKey==`ApiEndpoint`].OutputValue' \
      --output text
    ```
@@ -163,7 +163,7 @@ export CLOUDFRONT_DISTRIBUTION_ID="E1234"    # CloudFront distribution
 2. **Configure Environment Variables in CodeBuild:**
    ```
    AWS_REGION=us-east-1
-   STACK_NAME=chimes-backend
+   STACK_NAME=kb-companion-backend
    FRONTEND_BUCKET=your-bucket-name (optional)
    CLOUDFRONT_DISTRIBUTION_ID=E1234 (optional)
    ```
@@ -246,8 +246,8 @@ Environment:
   Variables:
     KNOWLEDGE_BASE_ID: kb-xxxxxxxxx        # Bedrock Knowledge Base ID
     MODEL_ID: amazon.nova-pro-v1:0         # Bedrock model ID
-    CONVERSATIONS_TABLE: chimes-conversations
-    FEEDBACK_TABLE: chimes-feedback
+    CONVERSATIONS_TABLE: kb-conversations
+    FEEDBACK_TABLE: kb-feedback
 ```
 
 ### Frontend Environment Variables
@@ -300,7 +300,7 @@ Before deploying to production:
 
 ### Logs and Monitoring
 
-- **Backend logs:** CloudWatch Logs → `/aws/lambda/chimes-*`
+- **Backend logs:** CloudWatch Logs → `/aws/lambda/kb-*`
 - **Build logs:** CodeBuild console → Build history
 - **Amplify logs:** Amplify console → Build logs
 

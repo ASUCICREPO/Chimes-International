@@ -1,6 +1,6 @@
-# Chimes Frontend
+# Frontend
 
-React + TypeScript + Vite frontend for the Chimes Knowledge Companion.
+React + TypeScript + Vite frontend for the Knowledge Companion.
 
 ## Tech Stack
 

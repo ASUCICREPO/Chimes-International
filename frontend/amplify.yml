@@ -1,6 +1,6 @@
 version: 1
 
-# AWS Amplify buildspec for Chimes International Frontend
+# AWS Amplify buildspec for Knowledge Companion Frontend
 # This file is used when deploying only the frontend to AWS Amplify
 
 frontend:

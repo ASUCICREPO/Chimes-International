@@ -4,7 +4,7 @@ const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 
 const KNOWLEDGE_BASE_ID = process.env.KNOWLEDGE_BASE_ID;
 const AWS_REGION = 'us-east-1';
-const CONVERSATIONS_TABLE = process.env.CONVERSATIONS_TABLE || 'chimes-conversations';
+const CONVERSATIONS_TABLE = process.env.CONVERSATIONS_TABLE || 'kb-conversations';
 
 const bedrockAgent = new BedrockAgentRuntimeClient({ region: AWS_REGION });
 const ddbClient = new DynamoDBClient({ region: AWS_REGION });
@@ -42,7 +42,7 @@ exports.handler = async (event) => {
 
     // System prompt for better responses
     const systemPrompt = language === 'es'
-      ? `Eres el Compañero de Conocimiento de Chimes, un asistente útil para empleados de Chimes.
+      ? `Eres el Compañero de Conocimiento, un asistente útil para empleados de la organización.
 Responde completamente en español.
 
 Reglas de formato:
@@ -55,7 +55,7 @@ Reglas de formato:
 - Si hay pasos a seguir, ponlos en una lista numerada clara
 - Solo agrega una pregunta de seguimiento si genuinamente es útil — no la fuerces en cada respuesta
 - Nunca uses lenguaje legal o corporativo innecesario. Escribe como un compañero de trabajo amigable y conocedor.`
-      : `You are the Chimes Knowledge Companion, a helpful assistant for Chimes employees.
+      : `You are the Knowledge Companion, a helpful assistant for organization employees.
 
 Formatting rules:
 - NEVER prefix your response with "Answer:", "Response:", or any label. Just reply directly.

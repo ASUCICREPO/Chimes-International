@@ -4,7 +4,7 @@ const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 const client = new DynamoDBClient({ region: 'us-east-1' });
 const dynamodb = DynamoDBDocumentClient.from(client);
 
-const FEEDBACK_TABLE = process.env.FEEDBACK_TABLE || 'chimes-feedback';
+const FEEDBACK_TABLE = process.env.FEEDBACK_TABLE || 'kb-feedback';
 
 exports.handler = async (event) => {
   const corsHeaders = {

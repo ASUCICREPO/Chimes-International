@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Chimes Knowledge Companion - Internal FAQ Chatbot Backend
+Description: Knowledge Companion - Internal FAQ Chatbot Backend
 
 Parameters:
   KnowledgeBaseId:
@@ -16,16 +16,16 @@ Globals:
     Environment:
       Variables:
         KNOWLEDGE_BASE_ID: !Ref KnowledgeBaseId
-        CONVERSATIONS_TABLE: chimes-conversations
-        FEEDBACK_TABLE: chimes-feedback
+        CONVERSATIONS_TABLE: kb-conversations
+        FEEDBACK_TABLE: kb-feedback
 
 Resources:
   ChatFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: chimes-chat-function
+      FunctionName: kb-chat-function
       Handler: src/handlers/chat.handler
-      Description: Handles chat requests for Chimes Knowledge Companion
+      Description: Handles chat requests for Knowledge Companion
       Policies:
         - Statement:
             - Effect: Allow
@@ -48,26 +48,26 @@ Resources:
                 - dynamodb:GetItem
                 - dynamodb:Query
               Resource:
-                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/chimes-conversations
-                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/chimes-feedback
+                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/kb-conversations
+                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/kb-feedback
       Events:
         ChatApi:
           Type: Api
           Properties:
             Path: /chat
             Method: POST
-            RestApiId: !Ref ChimesApi
+            RestApiId: !Ref CompanionApi
         ChatOptions:
           Type: Api
           Properties:
             Path: /chat
             Method: OPTIONS
-            RestApiId: !Ref ChimesApi
+            RestApiId: !Ref CompanionApi
 
   FeedbackFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: chimes-feedback-function
+      FunctionName: kb-feedback-function
       Handler: src/handlers/feedback.handler
       Description: Handles feedback submissions
       Policies:
@@ -76,25 +76,25 @@ Resources:
               Action:
                 - dynamodb:PutItem
               Resource:
-                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/chimes-feedback
+                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/kb-feedback
       Events:
         FeedbackApi:
           Type: Api
           Properties:
             Path: /feedback
             Method: POST
-            RestApiId: !Ref ChimesApi
+            RestApiId: !Ref CompanionApi
         FeedbackOptions:
           Type: Api
           Properties:
             Path: /feedback
             Method: OPTIONS
-            RestApiId: !Ref ChimesApi
+            RestApiId: !Ref CompanionApi
 
   AnalyticsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: chimes-analytics-function
+      FunctionName: kb-analytics-function
       Handler: src/handlers/analytics.handler
       Description: Returns aggregated analytics data for the admin dashboard
       Timeout: 30
@@ -106,26 +106,26 @@ Resources:
                 - dynamodb:Query
                 - dynamodb:GetItem
               Resource:
-                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/chimes-conversations
-                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/chimes-feedback
+                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/kb-conversations
+                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/kb-feedback
       Events:
         AnalyticsApi:
           Type: Api
           Properties:
             Path: /analytics
             Method: GET
-            RestApiId: !Ref ChimesApi
+            RestApiId: !Ref CompanionApi
         AnalyticsOptions:
           Type: Api
           Properties:
             Path: /analytics
             Method: OPTIONS
-            RestApiId: !Ref ChimesApi
+            RestApiId: !Ref CompanionApi
 
   ConversationsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: chimes-conversations-function
+      FunctionName: kb-conversations-function
       Handler: src/handlers/conversations.handler
       Description: Returns recent conversations for chat history sidebar
       Timeout: 30
@@ -135,25 +135,25 @@ Resources:
               Action:
                 - dynamodb:Scan
               Resource:
-                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/chimes-conversations
+                - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/kb-conversations
       Events:
         ConversationsApi:
           Type: Api
           Properties:
             Path: /conversations
             Method: GET
-            RestApiId: !Ref ChimesApi
+            RestApiId: !Ref CompanionApi
         ConversationsOptions:
           Type: Api
           Properties:
             Path: /conversations
             Method: OPTIONS
-            RestApiId: !Ref ChimesApi
+            RestApiId: !Ref CompanionApi
 
-  ChimesApi:
+  CompanionApi:
     Type: AWS::Serverless::Api
     Properties:
-      Name: chimes-knowledge-companion-api
+      Name: knowledge-companion-api
       StageName: Prod
       Cors:
         AllowOrigin: "'*'"
@@ -163,7 +163,7 @@ Resources:
 Outputs:
   ApiEndpoint:
     Description: API Gateway endpoint URL
-    Value: !Sub https://${ChimesApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
+    Value: !Sub https://${CompanionApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
   ChatFunctionArn:
     Description: Chat Lambda Function ARN
     Value: !GetAtt ChatFunction.Arn

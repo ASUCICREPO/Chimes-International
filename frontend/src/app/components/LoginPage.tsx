@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Shield } from 'lucide-react';
-const chimesLogo = '/chimes-logo.png';
+import { branding } from '../branding';
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -72,8 +72,8 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              src={chimesLogo}
-              alt="Chimes"
+              src={branding.logoPath}
+              alt={branding.logoAlt}
               className="h-16"
             />
           </div>
@@ -86,10 +86,10 @@ export function LoginPage({ onLogin }: LoginPageProps) {
             className="text-center mb-8"
           >
             <h1 className="text-2xl text-[#004165] mb-3">
-              Welcome to Chimes Knowledge Companion
+              {branding.translations.en.loginWelcome}
             </h1>
             <p className="text-[#004165]/70">
-              Sign in to access trusted Chimes resources
+              {branding.translations.en.loginSubtitle}
             </p>
           </motion.div>
 
@@ -104,7 +104,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
             className="w-full bg-[#ff7900] text-white py-4 rounded-xl hover:bg-[#FC9F24] transition-all shadow-lg flex items-center justify-center gap-3 group"
           >
             <Shield className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            <span className="text-lg">Sign in with Chimes (SSO)</span>
+            <span className="text-lg">{branding.translations.en.ssoButton}</span>
           </motion.button>
 
           {/* Security Notice */}

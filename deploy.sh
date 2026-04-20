@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ###############################################################################
-# Chimes International - Deployment Script
+# Knowledge Companion - Deployment Script
 # Deploys both frontend and backend components
 ###############################################################################
 
@@ -14,7 +14,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-STACK_NAME="${STACK_NAME:-chimes-backend}"
+STACK_NAME="${STACK_NAME:-kb-companion-backend}"
 AWS_REGION="${AWS_REGION:-us-east-1}"
 FRONTEND_BUCKET="${FRONTEND_BUCKET:-}"
 CLOUDFRONT_DISTRIBUTION_ID="${CLOUDFRONT_DISTRIBUTION_ID:-}"
@@ -203,7 +203,7 @@ show_summary() {
 
 main() {
     echo ""
-    print_header "Chimes International Deployment"
+    print_header "Knowledge Companion Deployment"
     echo ""
 
     # Parse command line arguments
@@ -229,7 +229,7 @@ main() {
                 echo "  --help          Show this help message"
                 echo ""
                 echo "Environment Variables:"
-                echo "  STACK_NAME                   Backend stack name (default: chimes-backend)"
+                echo "  STACK_NAME                   Backend stack name (default: kb-companion-backend)"
                 echo "  AWS_REGION                   AWS region (default: us-east-1)"
                 echo "  FRONTEND_BUCKET              S3 bucket for frontend (optional)"
                 echo "  CLOUDFRONT_DISTRIBUTION_ID   CloudFront distribution ID (optional)"

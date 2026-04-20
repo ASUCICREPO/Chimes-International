@@ -1,6 +1,6 @@
-# Chimes Knowledge Companion - API Documentation
+# Knowledge Companion - API Documentation
 
-An AI-powered internal knowledge assistant for Chimes International employees that provides instant answers to HR, IT, benefits, and policy questions with source citations using Amazon Bedrock Knowledge Bases.
+An AI-powered internal knowledge assistant for employees that provides instant answers to HR, IT, benefits, and policy questions with source citations using Amazon Bedrock Knowledge Bases.
 
 ## Architecture Overview
 
@@ -135,7 +135,7 @@ curl -X POST https://api-id.execute-api.us-east-1.amazonaws.com/Prod/chat \
 
 **DynamoDB Integration**:
 
-- Table: `chimes-conversations`
+- Table: `kb-conversations`
 - Partition Key: `conversationId` (UUID)
 - Sort Key: `timestamp`
 - Attributes: `messages`, `language`, `userId`
@@ -207,7 +207,7 @@ curl -X POST https://api-id.execute-api.us-east-1.amazonaws.com/Prod/chat \
 
 **DynamoDB Integration**:
 
-- Table: `chimes-feedback`
+- Table: `kb-feedback`
 - Partition Key: `feedbackId` (generated)
 - Attributes: `messageId`, `rating`, `timestamp`, `userId`
 

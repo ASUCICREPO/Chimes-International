@@ -4,8 +4,8 @@ const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb')
 const client = new DynamoDBClient({ region: 'us-east-1' });
 const dynamodb = DynamoDBDocumentClient.from(client);
 
-const CONVERSATIONS_TABLE = process.env.CONVERSATIONS_TABLE || 'chimes-conversations';
-const FEEDBACK_TABLE = process.env.FEEDBACK_TABLE || 'chimes-feedback';
+const CONVERSATIONS_TABLE = process.env.CONVERSATIONS_TABLE || 'kb-conversations';
+const FEEDBACK_TABLE = process.env.FEEDBACK_TABLE || 'kb-feedback';
 
 exports.handler = async (event) => {
   const corsHeaders = {

@@ -1,6 +1,6 @@
-# Chimes Knowledge Companion - Infrastructure Documentation
+# Knowledge Companion - Infrastructure Documentation
 
-This document details the AWS infrastructure, deployment configuration, and operational procedures for the Chimes Knowledge Companion application.
+This document details the AWS infrastructure, deployment configuration, and operational procedures for the Knowledge Companion application.
 
 ## Table of Contents
 
@@ -53,7 +53,7 @@ This document details the AWS infrastructure, deployment configuration, and oper
 │  │                                                          │    │
 │  │  Amazon Bedrock                                         │    │
 │  │  ├─ Model: amazon.nova-pro-v1:0                        │    │
-│  │  ├─ Knowledge Base: Chimes Policy Documents            │    │
+│  │  ├─ Knowledge Base: Policy Documents                   │    │
 │  │  └─ Embeddings: amazon.titan-embed-text-v1            │    │
 │  │                                                          │    │
 │  └──────────────────────────────────────────────────────────┘    │
@@ -61,13 +61,13 @@ This document details the AWS infrastructure, deployment configuration, and oper
 │  ┌──────────────────── Data Layer ─────────────────────────┐    │
 │  │                                                          │    │
 │  │  DynamoDB Tables                                        │    │
-│  │  ├─ chimes-conversations (On-Demand)                   │    │
+│  │  ├─ kb-conversations (On-Demand)                       │    │
 │  │  │   └─ PK: conversationId, SK: timestamp             │    │
-│  │  └─ chimes-feedback (On-Demand)                        │    │
+│  │  └─ kb-feedback (On-Demand)                            │    │
 │  │      └─ PK: feedbackId                                  │    │
 │  │                                                          │    │
 │  │  Amazon S3                                              │    │
-│  │  └─ Bucket: chimes-knowledge-documents                 │    │
+│  │  └─ Bucket: kb-knowledge-documents                     │    │
 │  │      └─ Contains: Policy PDFs, HR docs, handbooks      │    │
 │  │                                                          │    │
 │  └──────────────────────────────────────────────────────────┘    │
@@ -166,7 +166,7 @@ GET    /analytics      → AnalyticsFunction
 #### B. Knowledge Base
 - **Embedding Model**: `amazon.titan-embed-text-v1`
 - **Vector Dimensions**: 1536
-- **Data Source**: S3 bucket (chimes-knowledge-documents)
+- **Data Source**: S3 bucket (kb-knowledge-documents)
 - **Sync Schedule**: Manual or scheduled
 - **Chunking Strategy**: Fixed size (300 tokens, 20% overlap)
 
@@ -181,11 +181,11 @@ GET    /analytics      → AnalyticsFunction
 
 **Purpose**: NoSQL database for conversations and feedback
 
-#### Table 1: chimes-conversations
+#### Table 1: kb-conversations
 
 **Configuration**:
 ```yaml
-TableName: chimes-conversations
+TableName: kb-conversations
 BillingMode: PAY_PER_REQUEST  # On-demand pricing
 PointInTimeRecoveryEnabled: true
 ```
@@ -218,15 +218,15 @@ PointInTimeRecoveryEnabled: true
     }
   ],
   "language": "en",
-  "userId": "employee@chimes.org"
+  "userId": "employee@yourorganization.com"
 }
 ```
 
-#### Table 2: chimes-feedback
+#### Table 2: kb-feedback
 
 **Configuration**:
 ```yaml
-TableName: chimes-feedback
+TableName: kb-feedback
 BillingMode: PAY_PER_REQUEST
 PointInTimeRecoveryEnabled: true
 ```
@@ -246,11 +246,11 @@ PointInTimeRecoveryEnabled: true
 
 **Purpose**: Store company documents for Knowledge Base
 
-**Bucket**: `chimes-knowledge-documents`
+**Bucket**: `kb-knowledge-documents`
 
 **Configuration**:
 ```yaml
-BucketName: chimes-knowledge-documents
+BucketName: kb-knowledge-documents
 Versioning: Enabled
 Encryption:
   ServerSideEncryptionConfiguration:
@@ -265,7 +265,7 @@ PublicAccessBlockConfiguration:
 
 **Folder Structure**:
 ```
-chimes-knowledge-documents/
+kb-knowledge-documents/
 ├── hr/
 │   ├── vacation-policy.pdf
 │   ├── benefits-guide.pdf
@@ -298,7 +298,7 @@ VITE_AWS_REGION=us-east-1
 ```
 
 **Custom Domain** (optional):
-- Domain: `chimes-assistant.yourcompany.com`
+- Domain: `assistant.yourcompany.com`
 - SSL Certificate: Auto-provisioned by Amplify
 
 ---
@@ -308,11 +308,11 @@ VITE_AWS_REGION=us-east-1
 **Purpose**: Logging, monitoring, and alerting
 
 **Log Groups**:
-- `/aws/lambda/chimes-chat` (7-day retention)
-- `/aws/lambda/chimes-conversations` (7-day retention)
-- `/aws/lambda/chimes-feedback` (7-day retention)
-- `/aws/lambda/chimes-analytics` (7-day retention)
-- `/aws/apigateway/chimes-api` (7-day retention)
+- `/aws/lambda/kb-chat` (7-day retention)
+- `/aws/lambda/kb-conversations` (7-day retention)
+- `/aws/lambda/kb-feedback` (7-day retention)
+- `/aws/lambda/kb-analytics` (7-day retention)
+- `/aws/apigateway/kb-api` (7-day retention)
 
 **Metrics**:
 - Lambda invocations, errors, duration
@@ -334,7 +334,7 @@ VITE_AWS_REGION=us-east-1
 ```yaml
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Chimes Knowledge Companion Backend
+Description: Knowledge Companion Backend
 
 Globals:
   Function:
@@ -359,7 +359,7 @@ Parameters:
 
 Resources:
   # API Gateway
-  ChimesApi:
+  CompanionApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
@@ -378,7 +378,7 @@ Resources:
         ChatApi:
           Type: Api
           Properties:
-            RestApiId: !Ref ChimesApi
+            RestApiId: !Ref CompanionApi
             Path: /chat
             Method: post
       Policies:
@@ -395,7 +395,7 @@ Resources:
   ConversationsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: chimes-conversations
+      TableName: kb-conversations
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: conversationId
@@ -413,7 +413,7 @@ Resources:
 Outputs:
   ApiEndpoint:
     Description: API Gateway endpoint URL
-    Value: !Sub 'https://${ChimesApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
+    Value: !Sub 'https://${CompanionApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'
   ConversationsTableName:
     Description: DynamoDB table for conversations
     Value: !Ref ConversationsTable
@@ -453,8 +453,8 @@ Outputs:
         "dynamodb:UpdateItem"
       ],
       "Resource": [
-        "arn:aws:dynamodb:us-east-1:*:table/chimes-conversations",
-        "arn:aws:dynamodb:us-east-1:*:table/chimes-feedback"
+        "arn:aws:dynamodb:us-east-1:*:table/kb-conversations",
+        "arn:aws:dynamodb:us-east-1:*:table/kb-feedback"
       ]
     }
   ]
@@ -478,8 +478,8 @@ Outputs:
 |----------|-------------|---------|
 | `KNOWLEDGE_BASE_ID` | Bedrock KB identifier | `kb-abc123xyz456` |
 | `MODEL_ID` | Bedrock model to use | `amazon.nova-pro-v1:0` |
-| `CONVERSATIONS_TABLE` | DynamoDB table name | `chimes-conversations` |
-| `FEEDBACK_TABLE` | DynamoDB table name | `chimes-feedback` |
+| `CONVERSATIONS_TABLE` | DynamoDB table name | `kb-conversations` |
+| `FEEDBACK_TABLE` | DynamoDB table name | `kb-feedback` |
 | `AWS_REGION` | AWS region (auto-set) | `us-east-1` |
 
 ### Frontend (Amplify)
@@ -527,8 +527,8 @@ Outputs:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/ASUCICREPO/Chimes-International.git
-cd Chimes-International
+git clone [your-repo-url]
+cd kb-companion-backend
 
 # 2. Deploy backend
 cd backend
@@ -601,8 +601,8 @@ jobs:
 ```bash
 # Restore from point-in-time
 aws dynamodb restore-table-to-point-in-time \
-  --source-table-name chimes-conversations \
-  --target-table-name chimes-conversations-restored \
+  --source-table-name kb-conversations \
+  --target-table-name kb-conversations-restored \
   --restore-date-time 2025-03-24T12:00:00Z
 ```
 

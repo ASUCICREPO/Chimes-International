@@ -1,6 +1,6 @@
-# Chimes Knowledge Companion - Documentation
+# Knowledge Companion - Documentation
 
-Welcome to the comprehensive documentation for the Chimes Knowledge Companion project.
+Welcome to the comprehensive documentation for the Knowledge Companion project.
 
 ## 📚 Documentation Index
 
